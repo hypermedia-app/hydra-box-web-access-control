@@ -1,9 +1,6 @@
-import asyncMiddleware from 'middleware-async'
-import { ASK } from '@tpluscode/sparql-builder'
-import error from 'http-errors'
 import { NamedNode, Term } from 'rdf-js'
+import { ASK } from '@tpluscode/sparql-builder'
 import type { StreamClient } from 'sparql-http-client/StreamClient'
-import type * as express from 'express'
 import { acl, foaf, rdf, rdfs } from '@tpluscode/rdf-ns-builders'
 import type { GraphPointer } from 'clownface'
 
@@ -19,6 +16,12 @@ interface ResourceCheck extends Check {
 
 interface TypeCheck extends Check {
   types: Term[]
+}
+
+declare module 'express-serve-static-core' {
+  export interface Request {
+    agent?: GraphPointer<NamedNode>
+  }
 }
 
 function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'client'>) {
@@ -95,53 +98,10 @@ function typeAuthorization({ agent, accessMode, types }: Omit<TypeCheck, 'client
     }`
 }
 
-export async function check({ client, ...check }: ResourceCheck | TypeCheck): Promise<Error | null> {
-  let hasAccess
+export function check({ client, ...check }: ResourceCheck | TypeCheck): Promise<boolean> {
   if ('term' in check) {
-    hasAccess = await directAuthorization(check).execute(client.query)
-  } else {
-    hasAccess = await typeAuthorization(check).execute(client.query)
+    return directAuthorization(check).execute(client.query)
   }
 
-  return hasAccess ? null : new error.Forbidden()
+  return typeAuthorization(check).execute(client.query)
 }
-
-export const middleware = (client: StreamClient): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
-  if (!req.hydra.resource) {
-    return next()
-  }
-
-  let accessMode = req.hydra.operation?.out(acl.mode).term
-
-  if (!accessMode) {
-    switch (req.method.toUpperCase()) {
-      case 'GET':
-        accessMode = acl.Read
-        break
-      case 'POST':
-      case 'PUT':
-        accessMode = acl.Write
-        break
-      case 'DELETE':
-        accessMode = acl.Delete
-        break
-    }
-  }
-
-  if (!accessMode) {
-    return next(new error.InternalServerError('Could not determine ACL mode for operation'))
-  }
-
-  const result = await check({
-    term: req.hydra.term,
-    accessMode,
-    client,
-    agent: req.user?.pointer,
-  })
-
-  if (result) {
-    return next(result)
-  }
-
-  return next()
-})

@@ -1,0 +1,30 @@
+{
+  "name": "rdf-web-access-control",
+  "version": "0.0.0",
+  "description": "Run SPARQL queries to check resource access using Web Access Control vocabulary",
+  "main": "main.js",
+  "module": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "*.js",
+    "*.d.ts"
+  ],
+  "scripts": {
+    "prepack": "tsc"
+  },
+  "dependencies": {
+    "@tpluscode/rdf-ns-builders": "^0.4.2",
+    "@tpluscode/sparql-builder": "^0.3.12"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hypermedia-app/web-access-control.git",
+    "directory": "packages/rdf-web-access-control"
+  },
+  "author": "Tomasz Pluskiewicz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hypermedia-app/web-access-control/issues"
+  },
+  "homepage": "https://github.com/hypermedia-app/web-access-control/tree/master/packages/rdf-web-access-control"
+}
