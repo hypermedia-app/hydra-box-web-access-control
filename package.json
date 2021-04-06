@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "lint": "eslint . --ext .ts --quiet --ignore-path .gitignore --ignore-path .eslintignore",
-    "test": "c8 --all --reporter=lcov mocha --recursive --extension ts packages",
+    "test": "c8 --all --reporter=lcov mocha --recursive --extension ts packages/**/*.test.ts",
     "prepare": "husky install",
     "release": "changeset publish"
   },
