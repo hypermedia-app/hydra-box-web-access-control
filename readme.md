@@ -79,7 +79,7 @@ app.use((req, res, next) => {
 })
 
 // the middleware will access req.agent to get its URI and RDF types
-// it needs to be configured a hydra-box resource middleware
+// it needs to be configured as a hydra-box resource middleware
 app.use(hydraBox.middleware(api, {
   middleware: {
     resource: [
