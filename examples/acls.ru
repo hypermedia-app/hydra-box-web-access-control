@@ -22,8 +22,8 @@ graph <urn:acl:sheldon-reads-organizations> {
   .
 }
 
-graph <urn:acl:annymous-reads-organizations> {
-  <urn:acl:annymous-reads-organizations>
+graph <urn:acl:anonymous-reads-creative-works> {
+  <urn:acl:anonymous-reads-creative-works>
     a acl:Authorization ;
     acl:mode acl:Read ;
     acl:accessToClass schema:CreativeWork ;
