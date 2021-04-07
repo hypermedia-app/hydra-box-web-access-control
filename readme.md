@@ -56,6 +56,7 @@ import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { rdf, acl } from '@tpluscode/rdf-ns-builders'
 import SparqlClient from 'sparql-http-client'
+import * as hydraBox from 'hydra-box'
 import accessControl from 'hydra-box-web-access-control' 
  
 const app = express()
@@ -77,9 +78,14 @@ app.use((req, res, next) => {
   next()
 })
 
-// the middleware will access req.agent to get its URI and RDF types 
-app.use(accessControl({
-  client,
+// the middleware will access req.agent to get its URI and RDF types
+// it needs to be configured a hydra-box resource middleware
+app.use(hydraBox.middleware(api, {
+  middleware: {
+    resource: [
+      accessControl({ client })
+    ]
+  }
 }))
 ```
 
