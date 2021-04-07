@@ -144,6 +144,18 @@ describe('rdf-web-access-control', function () {
         // then
         expect(hasAccess).to.be.true
       })
+
+      it('should be true when granted anonymous access to class of resources', async () => {
+        // when
+        const hasAccess = await check({
+          client,
+          accessMode: acl.Read,
+          types: [schema.CreativeWork],
+        })
+
+        // then
+        expect(hasAccess).to.be.true
+      })
     })
   })
 })

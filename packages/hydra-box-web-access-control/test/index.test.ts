@@ -70,6 +70,26 @@ describe('hydra-box-web-access-control', () => {
     await response.expect(httpStatus.FORBIDDEN)
   })
 
+  it('does nothing if request has no hydra resource', async () => {
+    // given
+    app.use((req, res, next) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      delete req.hydra.resource
+      next()
+    })
+    app.use(accessControl({
+      client,
+    }))
+    aclSpy.check.resolves(false)
+
+    // when
+    await request(app).get('/resource')
+
+    // then
+    expect(acl.check).not.to.have.been.called
+  })
+
   it('responds 200 when access is granted', async () => {
     // given
     aclSpy.check.resolves(true)
