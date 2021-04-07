@@ -2,15 +2,49 @@
 
 Querying [Web Access Control](https://www.w3.org/wiki/WebAccessControl) entries over a SPARQL endpoint to authorize access to resources.
 
-## hydra-box-web-access-control
-
-Protects [Hydra APIs](http://www.hydra-cg.com/spec/latest/core/) running [hydra-box](https://npm.im/hydra-box). 
-
 ### What it does?
 
 Given the accessed resource and an agent, it executes queries to see if that agent should be granted access to said resource.  
 
-See below for details. 
+Currently, the library makes some assumptions about the store structure:
+
+1. Protected resources and ACLs have to be in the same store
+2. The default graph is queried. Consult your store so that the [union graph](https://patterns.dataincubator.org/book/union-graph.html) is used as the active dataset
+
+See below for more details. 
+
+### Examples
+
+Check the [examples](./examples/acls.ru) file for various instances of `acl:Autorization` resources. 
+
+## hydra-box-web-access-control
+
+Protects [Hydra APIs](http://www.hydra-cg.com/spec/latest/core/) running [hydra-box](https://npm.im/hydra-box).
+
+Instances of `hydra:Operation` can be annotated with a `acl:mode` property to force this access mode being checked:
+
+```turtle
+@prefix acl: <http://www.w3.org/ns/auth/acl#> .
+@prefix hydra: <http://www.w3.org/ns/hydra/core#> .
+
+[
+  a hydra:Operation ;
+  hydra:method "POST" ;
+  acl:mode acl:Write ;
+] .
+``` 
+
+If not explicitly stated, the HTTP method will be mapped:
+
+| method | access mode |
+| -- | -- |
+| `GET` | `acl:Read` |
+| `HEAD` | `acl:Read` |
+| `OPTIONS` | `acl:Read` |
+| `POST` | `acl:Write` |
+| `PUT` | `acl:Write` |
+| `PATCH` | `acl:Write` |
+| `DELETE` | `acl:Write` |
 
 ### Setup
 

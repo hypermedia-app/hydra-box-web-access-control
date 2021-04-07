@@ -35,8 +35,6 @@ function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'c
     VALUES ?agent { ${agentTerm || '<>'} }
     VALUES ?agentClass { ${foaf.Agent} ${agentClass} }
 
-    ${term} a ?type .
-
     {
       ?authorization a ${acl.Authorization} ;
                      ${acl.mode} ?mode ;
@@ -52,6 +50,7 @@ function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'c
     }
     union
     {
+      ${term} a ?type .
       ?authorization a ${acl.Authorization} ;
                      ${acl.mode} ?mode ;
                      ${acl.agentClass} ?agentClass ;
@@ -59,6 +58,7 @@ function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'c
     }
     union
     {
+      ${term} a ?type .
       ?authorization a ${acl.Authorization} ;
                      ${acl.mode} ?mode ;
                      ${acl.agent} ?agent ;

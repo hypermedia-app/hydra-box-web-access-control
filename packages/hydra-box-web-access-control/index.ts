@@ -9,7 +9,7 @@ interface Option {
   client: StreamClient
 }
 
-export const middleware = ({ client }: Option): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
+export default ({ client }: Option): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
   if (!req.hydra.resource) {
     return next()
   }
@@ -19,14 +19,15 @@ export const middleware = ({ client }: Option): express.RequestHandler => asyncM
   if (!accessMode) {
     switch (req.method.toUpperCase()) {
       case 'GET':
+      case 'HEAD':
+      case 'OPTIONS':
         accessMode = acl.Read
         break
       case 'POST':
       case 'PUT':
-        accessMode = acl.Write
-        break
+      case 'PATCH':
       case 'DELETE':
-        accessMode = acl.Delete
+        accessMode = acl.Write
         break
     }
   }
