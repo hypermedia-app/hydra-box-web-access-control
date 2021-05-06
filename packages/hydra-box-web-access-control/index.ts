@@ -32,7 +32,7 @@ export default ({ client }: Option): express.RequestHandler => asyncMiddleware(a
     }
   }
 
-  if (!accessMode) {
+  if (accessMode?.termType !== 'NamedNode') {
     return next(new error.InternalServerError('Could not determine ACL mode for operation'))
   }
 

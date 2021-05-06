@@ -51,6 +51,20 @@ describe('rdf-web-access-control', function () {
         expect(hasAccess).to.be.true
       })
 
+      it('ignores blank node agent types', async () => {
+        // when
+        const hasAccess = await check({
+          client,
+          accessMode: acl.Write,
+          term: resource.Penny,
+          agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard })
+            .addOut(rdf.type, $rdf.blankNode()),
+        })
+
+        // then
+        expect(hasAccess).to.be.true
+      })
+
       it('should be true when granted access to class', async () => {
         // when
         const hasAccess = await check({
@@ -126,6 +140,21 @@ describe('rdf-web-access-control', function () {
           agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
             .addOut(rdf.type, schema.Employee),
           types: [schema.Comment],
+        })
+
+        // then
+        expect(hasAccess).to.be.true
+      })
+
+      it('ignores blank node types', async () => {
+        // when
+        const hasAccess = await check({
+          client,
+          accessMode: acl.Write,
+          agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            .addOut(rdf.type, schema.Employee)
+            .addOut(rdf.type, $rdf.blankNode()),
+          types: [schema.Comment, $rdf.blankNode()],
         })
 
         // then

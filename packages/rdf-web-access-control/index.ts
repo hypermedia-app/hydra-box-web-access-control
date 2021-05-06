@@ -5,7 +5,7 @@ import { acl, foaf, rdf, rdfs } from '@tpluscode/rdf-ns-builders'
 import type { GraphPointer } from 'clownface'
 
 interface Check {
-  accessMode: Term[] | Term
+  accessMode: NamedNode[] | NamedNode
   client: StreamClient
   agent?: GraphPointer
 }
@@ -24,16 +24,23 @@ declare module 'express-serve-static-core' {
   }
 }
 
-function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'client'>) {
-  const agentClass = agent
+function onlyNamedNodes({ termType }: Term) {
+  return termType === 'NamedNode'
+}
+
+function agentClass(agent: GraphPointer | undefined) {
+  return agent
     ? [...agent.out(rdf.type).terms, acl.AuthenticatedAgent]
     : []
+}
+
+function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'client'>) {
   const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
 
   return ASK`
     VALUES ?mode { ${acl.Control} ${accessMode} }
     VALUES ?agent { ${agentTerm || '<>'} }
-    VALUES ?agentClass { ${foaf.Agent} ${agentClass} }
+    VALUES ?agentClass { ${foaf.Agent} ${agentClass(agent).filter(onlyNamedNodes)} }
 
     {
       ?authorization a ${acl.Authorization} ;
@@ -71,17 +78,13 @@ function directAuthorization({ agent, accessMode, term }: Omit<ResourceCheck, 'c
 }
 
 function typeAuthorization({ agent, accessMode, types }: Omit<TypeCheck, 'client'>) {
-  const agentClass = agent
-    ? [...agent.out(rdf.type).terms, acl.AuthenticatedAgent]
-    : []
-
   const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
 
   return ASK`
     VALUES ?mode { ${acl.Control} ${accessMode} }
-    VALUES ?type { ${rdfs.Resource} ${types} }
+    VALUES ?type { ${rdfs.Resource} ${types.filter(onlyNamedNodes)} }
     VALUES ?agent { ${agentTerm || '<>'} }
-    VALUES ?agentClass { ${foaf.Agent} ${agentClass} }
+    VALUES ?agentClass { ${foaf.Agent} ${agentClass(agent).filter(onlyNamedNodes)} }
 
     {
       ?authorization a ${acl.Authorization} ;
