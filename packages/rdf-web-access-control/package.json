@@ -1,6 +1,6 @@
 {
   "name": "rdf-web-access-control",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Run SPARQL queries to check resource access using Web Access Control vocabulary",
   "main": "main.js",
   "module": "index.js",
