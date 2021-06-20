@@ -100,10 +100,11 @@ The underlying library used by `hydra-box-web-access-control` middleware.
 import { check } from 'rdf-web-access-control'
 
 const hasAccess: boolean = await check({
-  accessMode, // subclass of acl:Access, such as acl:Read or acl:Write
-  agent,      // agent Graph Pointer
-  term,       // resource URI
-  client,     // sparql-http-client
+  accessMode,         // subclass of acl:Access, such as acl:Read or acl:Write
+  agent,              // agent Graph Pointer
+  term,               // resource URI
+  client,             // sparql-http-client
+  additionalPatterns, // function(s) to add more filters
 })
 ```
 
@@ -157,3 +158,31 @@ All queries will implicitly add `rdfs:Resource` to the queries types. Given a st
   acl:accessToClass rdfs:Resource ;
 .
 ```
+
+
+### Additional authorization restrictions
+
+It is possible to restrict considered instances of `acl:Authorization`, for example to select only ACLs valid for given timeframe or by a custom property.
+
+To do that, pass a function to the `check` call, which will return partial SPARQL patterns. It takes an RDF/JS Variable object as input which will match the ACL resources in the query,
+
+```typescript
+import { Variable } from '@rdfjs/types'
+import { schema } from '@tpluscode/rdf-ns-builders'
+import { sparql } from '@tpluscode/sparql-builder'
+import { toRdf } from 'rdf-literal'
+import { check } from 'rdf-web-access-control' 
+
+const hasAccess: boolean = check({
+  additionalPatterns(acl: Variable) {
+    return sparql`
+      ${acl} ${schema.validThrough} ?validThrough .
+      FILTER( ?validThrough >= ${toRdf(new Date())})
+    `
+  }
+})
+```
+
+It is also possible to pass an array of multiple such SPARQL-building functions.
+
+Similar applies to configuring the `hydra-box-web-access-control` middleware.

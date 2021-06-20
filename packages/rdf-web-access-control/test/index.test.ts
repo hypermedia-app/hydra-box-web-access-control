@@ -4,11 +4,13 @@ import { describe, it } from 'mocha'
 import * as compose from 'docker-compose'
 import waitOn from 'wait-on'
 import StreamClient from 'sparql-http-client'
-import { acl, rdf, schema } from '@tpluscode/rdf-ns-builders'
+import { acl, prov, rdf, schema } from '@tpluscode/rdf-ns-builders'
 import namespace from '@rdfjs/namespace'
 import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { expect } from 'chai'
+import { INSERT, sparql } from '@tpluscode/sparql-builder'
+import { Variable } from '@rdfjs/types'
 import { check } from '../index'
 
 const resource = namespace('http://example.com/')
@@ -29,26 +31,77 @@ describe('rdf-web-access-control', function () {
       resources: ['http://localhost:3030'],
     })
 
-    const exampleAcls = fs.readFileSync(path.resolve(__dirname, '../../../examples/acls.ru'))
-    await client.query.update(exampleAcls.toString())
-
     const exampleData = fs.readFileSync(path.resolve(__dirname, '../../../examples/data.ru'))
     await client.query.update(exampleData.toString())
   })
 
+  beforeEach(async () => {
+    const exampleAcls = fs.readFileSync(path.resolve(__dirname, '../../../examples/acls.ru'))
+    await client.query.update(exampleAcls.toString())
+  })
+
   describe('check', () => {
+    function additionalPatterns(acl: Variable) {
+      return sparql`${acl} ${prov.component} <urn:acl:component> .`
+    }
+
+    async function insertProvenance() {
+      await INSERT`
+        GRAPH ?acl {
+          ?acl ${prov.component} <urn:acl:component> .
+        }
+      `.WHERE`
+        GRAPH ?acl {
+          ?acl a ${acl.Authorization} .
+        }
+      `.execute(client.query)
+    }
+
     describe('ResourceCheck', () => {
-      it('should be true when directly granted access', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Write,
-          term: resource.Penny,
-          agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+      describe('direct access', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Penny,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
+        it('should not be granted if additional pattern is not matched', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Penny,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
+
+        it('should be granted if additional pattern is matched', async () => {
+          // given
+          await insertProvenance()
+
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Penny,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
       })
 
       it('ignores blank node agent types', async () => {
@@ -65,59 +118,191 @@ describe('rdf-web-access-control', function () {
         expect(hasAccess).to.be.true
       })
 
-      it('should be true when granted access to class', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Read,
-          term: resource.Caltech,
-          agent: clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+      describe('access to class', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.Caltech,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
-      })
+        it('should be granted if additional pattern is matched', async () => {
+          // given
+          await insertProvenance()
 
-      it('should be true when granted access to class for anonymous', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Read,
-          term: resource.PublicReport,
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.Caltech,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
+        it('should not be granted if additional pattern is not matched', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.Caltech,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
       })
 
-      it('should be true when agent owns resource', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Read,
-          term: resource.PrivateReport,
-          agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+      describe('access to class for anonymous', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PublicReport,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
-      })
+        it('should be granted when additional pattern matches', async () => {
+          // given
+          await insertProvenance()
 
-      it('should be true when granted access to class of resources for class of agents', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Write,
-          term: resource.Comment,
-          agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
-            .addOut(rdf.type, schema.Employee),
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PublicReport,
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
+        it('should not be granted when additional pattern does not match', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PublicReport,
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
       })
 
-      it('should be false if resource does not exist', async () => {
+      describe('when agent owns resource', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PrivateReport,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should be granted when additional patterns are matched', async () => {
+          // given
+          await insertProvenance()
+
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PrivateReport,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should be granted when additional patterns are not matched', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PrivateReport,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+      })
+
+      describe('access to class of resources for class of agents', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Comment,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+              .addOut(rdf.type, schema.Employee),
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should be granted when additional patterns match', async () => {
+          // given
+          await insertProvenance()
+
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Comment,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+              .addOut(rdf.type, schema.Employee),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should not be granted when additional patterns do not match', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Comment,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+              .addOut(rdf.type, schema.Employee),
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
+      })
+
+      it('should not be granted if resource does not exist', async () => {
         // when
         const hasAccess = await check({
           client,
@@ -132,18 +317,53 @@ describe('rdf-web-access-control', function () {
     })
 
     describe('TypeCheck', () => {
-      it('should be true when granted access to class of resources for class of agents', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Write,
-          agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
-            .addOut(rdf.type, schema.Employee),
-          types: [schema.Comment],
+      describe('access to class of resources for class of agents', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+              .addOut(rdf.type, schema.Employee),
+            types: [schema.Comment],
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
+        it('should be granted when additional patterns match', async () => {
+          // given
+          await insertProvenance()
+
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+              .addOut(rdf.type, schema.Employee),
+            types: [schema.Comment],
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should not be granted when additional patterns match', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+              .addOut(rdf.type, schema.Employee),
+            types: [schema.Comment],
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
       })
 
       it('ignores blank node types', async () => {
@@ -161,29 +381,93 @@ describe('rdf-web-access-control', function () {
         expect(hasAccess).to.be.true
       })
 
-      it('should be true when granted access to class of resources', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Write,
-          agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
-          types: [schema.ScholarlyArticle],
+      describe('access to class of resources', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            types: [schema.ScholarlyArticle],
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
+        it('should be granted when additional patterns match', async () => {
+          // given
+          await insertProvenance()
+
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            types: [schema.ScholarlyArticle],
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should not be granted when additional patterns do not match', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            types: [schema.ScholarlyArticle],
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
       })
 
-      it('should be true when granted anonymous access to class of resources', async () => {
-        // when
-        const hasAccess = await check({
-          client,
-          accessMode: acl.Read,
-          types: [schema.CreativeWork],
+      describe('anonymous access to class of resources', () => {
+        it('should be granted', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            types: [schema.CreativeWork],
+          })
+
+          // then
+          expect(hasAccess).to.be.true
         })
 
-        // then
-        expect(hasAccess).to.be.true
+        it('should be granted when additional patterns match', async () => {
+          // given
+          await insertProvenance()
+
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            types: [schema.CreativeWork],
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should not be granted when additional patterns do not match', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            types: [schema.CreativeWork],
+            additionalPatterns,
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
       })
     })
   })

@@ -1323,14 +1323,15 @@
     "@tpluscode/rdf-ns-builders" "^0.4"
     "@zazuko/rdf-vocabularies" "*"
 
-"@tpluscode/sparql-builder@^0.3.12":
-  version "0.3.12"
-  resolved "https://registry.yarnpkg.com/@tpluscode/sparql-builder/-/sparql-builder-0.3.12.tgz#0d017911969a15e956f180eddaf6bea74efb86da"
-  integrity sha512-sPXADwCs+pdN10IPw6EeMNGFZnanP0Ab6gmlo8HEAooCOZs6ZlVpl1S358/7U4zbdLjfnWeyUTdRlR5Ok2Y+IQ==
+"@tpluscode/sparql-builder@^0.3.14":
+  version "0.3.14"
+  resolved "https://registry.yarnpkg.com/@tpluscode/sparql-builder/-/sparql-builder-0.3.14.tgz#60959c1306cfcade2eee8b9b6498d3793fadef3b"
+  integrity sha512-dD9lJ8hbL9LWcQ5ht07nDWUps4bj5z3manrTkxfZhaxSX1eUyvsCLXRmoPmvgAMHJbwZ4LCli17kFp0MPW0PWg==
   dependencies:
     "@rdf-esm/data-model" "^0.5.4"
     "@rdf-esm/term-set" "^0.5.0"
-    "@tpluscode/rdf-ns-builders" "^0.4"
+    "@rdfjs/types" "*"
+    "@tpluscode/rdf-ns-builders" "^1.0.0"
     "@tpluscode/rdf-string" "^0.2.16"
     debug "^4.1.1"
 

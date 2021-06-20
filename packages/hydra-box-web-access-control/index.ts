@@ -3,13 +3,13 @@ import error from 'http-errors'
 import type { StreamClient } from 'sparql-http-client/StreamClient'
 import type * as express from 'express'
 import { acl } from '@tpluscode/rdf-ns-builders'
-import { check } from 'rdf-web-access-control'
+import { check, Check } from 'rdf-web-access-control'
 
-interface Option {
+interface Option extends Pick<Check, 'additionalPatterns'> {
   client: StreamClient
 }
 
-export default ({ client }: Option): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
+export default ({ client, additionalPatterns }: Option): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
   if (!req.hydra.resource) {
     return next()
   }
@@ -41,6 +41,7 @@ export default ({ client }: Option): express.RequestHandler => asyncMiddleware(a
     accessMode,
     client,
     agent: req.agent,
+    additionalPatterns,
   })
 
   if (!result) {
