@@ -162,7 +162,7 @@ All queries will implicitly add `rdfs:Resource` to the queries types. Given a st
 
 ### Additional authorization restrictions
 
-It is possible to restrict considered instances of `acl:Authorization`, for example to select only ACLs valid for given temporal filter or a custom property.
+It is possible to restrict considered instances of `acl:Authorization`, for example to select only ACLs valid for given timeframe or by a custom property.
 
 To do that, pass a function to the `check` call, which will return partial SPARQL patterns. It takes an RDF/JS Variable object as input which will match the ACL resources in the query,
 
