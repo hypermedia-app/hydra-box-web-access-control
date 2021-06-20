@@ -1,4 +1,4 @@
-import { NamedNode, Term } from 'rdf-js'
+import { NamedNode, Term } from '@rdfjs/types'
 import { ASK } from '@tpluscode/sparql-builder'
 import type { StreamClient } from 'sparql-http-client/StreamClient'
 import { acl, foaf, rdf, rdfs } from '@tpluscode/rdf-ns-builders'
