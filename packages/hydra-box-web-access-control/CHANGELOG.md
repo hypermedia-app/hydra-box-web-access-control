@@ -1,5 +1,11 @@
 # hydra-box-web-access-control
 
+## 1.1.1
+
+### Patch Changes
+
+- bef021d: Add express `Request` as second parameter to custom patterns
+
 ## 1.1.0
 
 ### Minor Changes
