@@ -89,6 +89,24 @@ app.use(hydraBox.middleware(api, {
 }))
 ```
 
+### Per-request authorization restrictions
+
+A function of array of functions can be optionally passed to the middleware. They take an RDF/JS variable, and the current request object as parameters and should return additional SPARQL patterns to filter out ACL authorization resources as desired.
+
+```typescript
+import accessControl from 'hydra-box-web-access-control'
+import { Variable } from '@rdfjs/types'
+import { Request } from 'express'
+
+const middleware =  accessControl({ 
+    client,
+    additionalPatterns(acl: Variable, req: Request) {
+        // ...
+    }
+ })
+```
+
+See [below](#additional-authorization-restrictions) for a complete example. The only difference is that the `hydra-box-web-access-control` adds the second parameter while the other accepts only one.
 
 ## rdf-web-access-control
 
@@ -164,7 +182,7 @@ All queries will implicitly add `rdfs:Resource` to the queries types. Given a st
 
 It is possible to restrict considered instances of `acl:Authorization`, for example to select only ACLs valid for given timeframe or by a custom property.
 
-To do that, pass a function to the `check` call, which will return partial SPARQL patterns. It takes an RDF/JS Variable object as input which will match the ACL resources in the query,
+To do that, pass a function to the `check` call, which will return partial SPARQL patterns. It takes an RDF/JS Variable object as input which will match the ACL resources in the query.
 
 ```typescript
 import { Variable } from '@rdfjs/types'
