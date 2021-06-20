@@ -36,6 +36,7 @@ describe('hydra-box-web-access-control', () => {
 
   it('passes right parameters to check', async () => {
     // given
+    const additionalPatterns = () => ''
     const agent = clownface({ dataset: $rdf.dataset() }).namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
@@ -43,6 +44,7 @@ describe('hydra-box-web-access-control', () => {
     })
     app.use(accessControl({
       client,
+      additionalPatterns,
     }))
 
     // when
@@ -53,6 +55,7 @@ describe('hydra-box-web-access-control', () => {
       client,
       agent,
       term,
+      additionalPatterns,
     }))
   })
 
