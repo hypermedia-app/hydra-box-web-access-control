@@ -55,8 +55,10 @@ INSERT {
   }
 }
 WHERE {
-  GRAPH ?g {
-    ?s ?p ?o .
-    ?s a acl:Authorization .
+  OPTIONAL {
+    GRAPH ?g {
+      ?s ?p ?o .
+      ?s a acl:Authorization .
+    }
   }
 }
