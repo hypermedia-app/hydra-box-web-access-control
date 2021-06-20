@@ -1,6 +1,6 @@
 {
   "name": "hydra-box-web-access-control",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Using W3C Web Access Control vocabulary to protect Hydra APIs",
   "main": "main.js",
   "module": "index.js",
