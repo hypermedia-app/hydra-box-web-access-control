@@ -42,7 +42,7 @@ function agentClass(agent: GraphPointer | undefined) {
 
 function combinePatterns(patterns: Required<Check>['additionalPatterns'], acl: Variable) {
   if (Array.isArray(patterns)) {
-    return patterns.reduce((prev, next) => sparql`${prev}\n${next}`, sparql``)
+    return patterns.reduce((prev, next) => sparql`${prev}\n${next(acl)}`, sparql``)
   }
 
   return patterns(acl)
