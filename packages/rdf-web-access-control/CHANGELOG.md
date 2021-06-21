@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 1.1.1
+
+### Patch Changes
+
+- b138b3c: Pattern function would not have been called
+
 ## 1.1.0
 
 ### Minor Changes
