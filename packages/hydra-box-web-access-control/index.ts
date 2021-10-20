@@ -57,7 +57,7 @@ export default ({ client, additionalPatterns }: Option): express.RequestHandler 
   })
 
   if (!result) {
-    return next(new error.Forbidden())
+    return next(req.agent ? new error.Forbidden() : new error.Unauthorized())
   }
 
   return next()

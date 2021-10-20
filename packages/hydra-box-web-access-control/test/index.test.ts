@@ -59,8 +59,27 @@ describe('hydra-box-web-access-control', () => {
     }))
   })
 
-  it('responds 403 when access is not granted', async () => {
+  it('responds 401 when access is not granted', async () => {
     // given
+    app.use(accessControl({
+      client,
+    }))
+    aclSpy.check.resolves(false)
+
+    // when
+    const response = request(app).get('/resource')
+
+    // then
+    await response.expect(httpStatus.UNAUTHORIZED)
+  })
+
+  it('responds 403 when access is not granted and a user is authenticated', async () => {
+    // given
+    const agent = clownface({ dataset: $rdf.dataset() }).namedNode('')
+    app.use((req, res, next) => {
+      req.agent = agent
+      next()
+    })
     app.use(accessControl({
       client,
     }))
