@@ -1,5 +1,11 @@
 # hydra-box-web-access-control
 
+## 1.1.2
+
+### Patch Changes
+
+- 5f3621b: Response should be 401 when the is no authenticated agent
+
 ## 1.1.1
 
 ### Patch Changes
