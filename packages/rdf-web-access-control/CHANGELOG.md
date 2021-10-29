@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 1.2.0
+
+### Minor Changes
+
+- 14d6dbb: Ability to provide own authorization patterns. See "Custom authorization checks" in the readme
+
 ## 1.1.1
 
 ### Patch Changes
