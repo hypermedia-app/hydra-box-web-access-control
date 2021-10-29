@@ -1,5 +1,11 @@
 # hydra-box-web-access-control
 
+## 1.1.3
+
+### Patch Changes
+
+- 4ebbb90: Forward additional checks to `rdf-web-access-control`
+
 ## 1.1.2
 
 ### Patch Changes
