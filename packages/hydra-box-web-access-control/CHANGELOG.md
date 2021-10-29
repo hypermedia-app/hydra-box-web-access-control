@@ -1,5 +1,13 @@
 # hydra-box-web-access-control
 
+## 1.1.4
+
+### Patch Changes
+
+- 0495d3f: `lib` dir was missing from built package
+- Updated dependencies [0495d3f]
+  - rdf-web-access-control@1.2.2
+
 ## 1.1.3
 
 ### Patch Changes
