@@ -178,9 +178,29 @@ All queries will implicitly add `rdfs:Resource` to the queries types. Given a st
 ```
 
 
+### Custom authorization checks
+
+By default, the authorization will only occur using the `acl:agent` and `acl:agentClass` properties. Both or those strategies only use information provided by the caller, thus not impacting the query greatly.
+
+To provide more alternative ways to authorize agents, use the `additionalChecks` argument, by providing an array of functions which must return SPARQL pattern template or a RDF/JS Dataset with pattern triples.
+
+As an example, below is the implementation of using `acl:agentGroup`. It can be imported from `rdf-web-access-control/checks`
+
+```typescript
+import { sparql } from '@tpluscode/sparql-builder'
+import { acl, vcard } from '@tpluscode/rdf-ns-builders/strict'
+import type { AuthorizationPatterns } from 'rdf-web-access-control'
+
+export const agentGroup: AuthorizationPatterns = ({ agent, authorization }) => {
+  return sparql`${authorization} ${acl.agentGroup}/${vcard.hasMember} ${agent} .`
+}
+```
+
 ### Additional authorization restrictions
 
 It is possible to restrict considered instances of `acl:Authorization`, for example to select only ACLs valid for given timeframe or by a custom property.
+
+Every one of the "additional patterns" will be applied to every check, ie. `acl:agent`, `acl:agentClass` and the optional `additionalChecks` described above.
 
 To do that, pass a function to the `check` call, which will return partial SPARQL patterns. It takes an RDF/JS Variable object as input which will match the ACL resources in the query.
 

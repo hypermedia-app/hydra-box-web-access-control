@@ -1,44 +1,17 @@
-import fs from 'fs'
-import * as path from 'path'
 import { describe, it } from 'mocha'
-import * as compose from 'docker-compose'
-import waitOn from 'wait-on'
-import StreamClient from 'sparql-http-client'
 import { acl, prov, rdf, schema } from '@tpluscode/rdf-ns-builders'
-import namespace from '@rdfjs/namespace'
 import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { expect } from 'chai'
 import { INSERT, sparql } from '@tpluscode/sparql-builder'
 import { Variable } from '@rdfjs/types'
 import { check } from '../index'
+import { agentGroup } from '../checks'
+import { client, insertAcls, insertData, resource } from './data'
 
-const resource = namespace('http://example.com/')
-
-describe('rdf-web-access-control', function () {
-  this.timeout(200000)
-
-  const client = new StreamClient({
-    endpointUrl: 'http://localhost:3030/wac/query',
-    updateUrl: 'http://localhost:3030/wac/update',
-    user: 'admin',
-    password: 'password',
-  })
-
-  before(async () => {
-    await compose.upAll()
-    await waitOn({
-      resources: ['http://localhost:3030'],
-    })
-
-    const exampleData = fs.readFileSync(path.resolve(__dirname, '../../../examples/data.ru'))
-    await client.query.update(exampleData.toString())
-  })
-
-  beforeEach(async () => {
-    const exampleAcls = fs.readFileSync(path.resolve(__dirname, '../../../examples/acls.ru'))
-    await client.query.update(exampleAcls.toString())
-  })
+describe('rdf-web-access-control', () => {
+  before(insertData)
+  beforeEach(insertAcls)
 
   describe('check', () => {
     function additionalPatterns(acl: Variable) {
@@ -313,6 +286,50 @@ describe('rdf-web-access-control', function () {
 
         // then
         expect(hasAccess).to.be.false
+      })
+
+      describe('custom check', () => {
+        it('should grant access per extra check', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PrivateReport,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Penny }),
+            additionalChecks: [({ authorization, agent }) => sparql`${authorization} ${acl.accessTo}/${resource.sharedWith} ${agent}`],
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should grant access per group check to its members', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PrivateReport,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Penny }),
+            additionalChecks: [agentGroup],
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should not grant access per group check to non members', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Read,
+            term: resource.PrivateReport,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            additionalChecks: [agentGroup],
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
       })
     })
 

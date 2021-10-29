@@ -1,26 +1,38 @@
-import { NamedNode, Term, Variable } from '@rdfjs/types'
-import { SparqlTemplateResult, ASK, sparql } from '@tpluscode/sparql-builder'
+import { DatasetCore, NamedNode, Term, Variable } from '@rdfjs/types'
+import { SparqlTemplateResult } from '@tpluscode/sparql-builder'
 import type { StreamClient } from 'sparql-http-client/StreamClient'
-import { acl, foaf, rdf, rdfs } from '@tpluscode/rdf-ns-builders'
 import type { GraphPointer } from 'clownface'
-import { variable } from '@rdfjs/data-model'
+import * as checks from './checks'
+import { typeAuthorization } from './lib/typeAuthorization'
+import { instanceAuthorization } from './lib/instanceAuthorization'
 
 export interface AdditionalPatterns {
   (acl: Variable): SparqlTemplateResult | string
+}
+
+interface AuthorizationCheck {
+  authorization: Variable
+  agent: Term
+  agentClass: Term
+}
+
+export interface AuthorizationPatterns {
+  (arg: AuthorizationCheck): SparqlTemplateResult | DatasetCore
 }
 
 export interface Check {
   accessMode: NamedNode[] | NamedNode
   client: StreamClient
   agent?: GraphPointer
+  additionalChecks?: AuthorizationPatterns[]
   additionalPatterns?: AdditionalPatterns | AdditionalPatterns[]
 }
 
-interface ResourceCheck extends Check {
+export interface ResourceCheck extends Check {
   term: NamedNode
 }
 
-interface TypeCheck extends Check {
+export interface TypeCheck extends Check {
   types: Term[]
 }
 
@@ -30,103 +42,16 @@ declare module 'express-serve-static-core' {
   }
 }
 
-function onlyNamedNodes({ termType }: Term) {
-  return termType === 'NamedNode'
-}
+export function check({ client, additionalChecks = [], ...rest }: ResourceCheck | TypeCheck): Promise<boolean> {
+  const authorizationChecks = [
+    checks.agent,
+    checks.agentClass,
+    ...additionalChecks,
+  ]
 
-function agentClass(agent: GraphPointer | undefined) {
-  return agent
-    ? [...agent.out(rdf.type).terms, acl.AuthenticatedAgent]
-    : []
-}
-
-function combinePatterns(patterns: Required<Check>['additionalPatterns'], acl: Variable) {
-  if (Array.isArray(patterns)) {
-    return patterns.reduce((prev, next) => sparql`${prev}\n${next(acl)}`, sparql``)
+  if ('term' in rest) {
+    return instanceAuthorization(rest, authorizationChecks).execute(client.query)
   }
 
-  return patterns(acl)
-}
-
-function directAuthorization({ agent, accessMode, term, additionalPatterns = [] }: Omit<ResourceCheck, 'client'>) {
-  const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
-  const authorization = variable('authorization')
-
-  return ASK`
-    VALUES ?mode { ${acl.Control} ${accessMode} }
-    VALUES ?agent { ${agentTerm || '<>'} }
-    VALUES ?agentClass { ${foaf.Agent} ${agentClass(agent).filter(onlyNamedNodes)} }
-
-    {
-      ${authorization} a ${acl.Authorization} ;
-                     ${acl.mode} ?mode ;
-                     ${acl.agentClass} ?agentClass ;
-                     ${acl.accessTo} ${term} .
-      ${combinePatterns(additionalPatterns, authorization)}
-    }
-    union
-    {
-      ${authorization} a ${acl.Authorization} ;
-                     ${acl.mode} ?mode ;
-                     ${acl.agent} ?agent ;
-                     ${acl.accessTo} ${term} .
-      ${combinePatterns(additionalPatterns, authorization)}
-    }
-    union
-    {
-      ${term} a ?type .
-      ${authorization} a ${acl.Authorization} ;
-                     ${acl.mode} ?mode ;
-                     ${acl.agentClass} ?agentClass ;
-                     ${acl.accessToClass} ?type .
-      ${combinePatterns(additionalPatterns, authorization)}
-    }
-    union
-    {
-      ${term} a ?type .
-      ${authorization} a ${acl.Authorization} ;
-                     ${acl.mode} ?mode ;
-                     ${acl.agent} ?agent ;
-                     ${acl.accessToClass} ?type .
-      ${combinePatterns(additionalPatterns, authorization)}
-    }
-    union
-    {
-      ${term} ${acl.owner} ?agent .
-    }`
-}
-
-function typeAuthorization({ agent, accessMode, types, additionalPatterns = [] }: Omit<TypeCheck, 'client'>) {
-  const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
-  const authorization = variable('authorization')
-
-  return ASK`
-    VALUES ?mode { ${acl.Control} ${accessMode} }
-    VALUES ?type { ${rdfs.Resource} ${types.filter(onlyNamedNodes)} }
-    VALUES ?agent { ${agentTerm || '<>'} }
-    VALUES ?agentClass { ${foaf.Agent} ${agentClass(agent).filter(onlyNamedNodes)} }
-
-    ${combinePatterns(additionalPatterns, authorization)}
-
-    {
-      ${authorization} a ${acl.Authorization} ;
-                     ${acl.mode} ?mode ;
-                     ${acl.agentClass} ?agentClass ;
-                     ${acl.accessToClass} ?type .
-    }
-    union
-    {
-      ${authorization} a ${acl.Authorization} ;
-                     ${acl.mode} ?mode ;
-                     ${acl.agent} ?agent ;
-                     ${acl.accessToClass} ?type .
-    }`
-}
-
-export function check({ client, ...check }: ResourceCheck | TypeCheck): Promise<boolean> {
-  if ('term' in check) {
-    return directAuthorization(check).execute(client.query)
-  }
-
-  return typeAuthorization(check).execute(client.query)
+  return typeAuthorization(rest, authorizationChecks).execute(client.query)
 }
