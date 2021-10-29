@@ -53,6 +53,15 @@ INSERT {
       acl:agent <Howard>
     .
   }
+
+  graph <urn:acl:howard-shares-with-group> {
+    <urn:acl:howard-shares-with-group>
+      a acl:Authorization ;
+      acl:mode acl:Read ;
+      acl:accessTo <PrivateReport> ;
+      acl:agentGroup <Group> ;
+    .
+  }
 }
 WHERE {
   OPTIONAL {

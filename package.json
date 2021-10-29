@@ -42,6 +42,7 @@
     "typescript": "^4.2.3"
   },
   "mocha": {
+    "extension": ["ts"],
     "watch-files": [
       "./**/*.ts",
       "./**/*.ru"
