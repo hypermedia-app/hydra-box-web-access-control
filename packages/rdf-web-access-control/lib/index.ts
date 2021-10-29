@@ -14,7 +14,7 @@ export function agentClasses(agent: GraphPointer | undefined): Term[] {
     : []
 }
 
-export function combinePatterns(patterns: Required<Check>['additionalPatterns'], acl: Variable): SparqlTemplateResult {
+export function combinePatterns(patterns: Required<Check>['additionalPatterns'], acl: Variable): SparqlTemplateResult | string {
   if (Array.isArray(patterns)) {
     return patterns.reduce((prev, next) => sparql`${prev}\n${next(acl)}`, sparql``)
   }
