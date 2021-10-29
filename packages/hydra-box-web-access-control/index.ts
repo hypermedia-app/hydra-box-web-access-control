@@ -3,7 +3,7 @@ import error from 'http-errors'
 import type { StreamClient } from 'sparql-http-client/StreamClient'
 import type * as express from 'express'
 import { acl } from '@tpluscode/rdf-ns-builders'
-import { check, AdditionalPatterns } from 'rdf-web-access-control'
+import { check, AdditionalPatterns, Check } from 'rdf-web-access-control'
 import { Variable } from '@rdfjs/types'
 import type { SparqlTemplateResult } from '@tpluscode/sparql-builder'
 
@@ -14,6 +14,7 @@ export interface AclPatterns {
 interface Option {
   client: StreamClient
   additionalPatterns?: AclPatterns | AclPatterns[]
+  additionalChecks?: Check['additionalChecks']
 }
 
 function wrapPatterns(patterns: Option['additionalPatterns'] = [], req: express.Request): AdditionalPatterns[] {
@@ -21,7 +22,7 @@ function wrapPatterns(patterns: Option['additionalPatterns'] = [], req: express.
   return arr.map(func => acl => func(acl, req))
 }
 
-export default ({ client, additionalPatterns }: Option): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
+export default ({ client, additionalPatterns, additionalChecks }: Option): express.RequestHandler => asyncMiddleware(async (req, res, next) => {
   if (!req.hydra.resource) {
     return next()
   }
@@ -54,6 +55,7 @@ export default ({ client, additionalPatterns }: Option): express.RequestHandler 
     client,
     agent: req.agent,
     additionalPatterns: wrapPatterns(additionalPatterns, req),
+    additionalChecks,
   })
 
   if (!result) {
