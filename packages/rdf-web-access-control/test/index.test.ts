@@ -9,9 +9,8 @@ import { check } from '../index'
 import { agentGroup } from '../checks'
 import { client, insertAcls, insertData, resource } from './data'
 
-describe('rdf-web-access-control', function () {
+describe('rdf-web-access-control', () => {
   before(insertData)
-
   beforeEach(insertAcls)
 
   describe('check', () => {

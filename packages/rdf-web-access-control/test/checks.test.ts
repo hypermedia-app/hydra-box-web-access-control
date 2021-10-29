@@ -3,10 +3,13 @@ import { namedNode, variable } from '@rdfjs/data-model'
 import { SELECT } from '@tpluscode/sparql-builder'
 import { expect } from 'chai'
 import { agentGroup } from '../checks'
-import { parsingClient, resource } from './data'
+import { insertAcls, insertData, parsingClient, resource } from './data'
 
 describe('rdf-web-access-control/checks', () => {
-  it('', async () => {
+  before(insertData)
+  beforeEach(insertAcls)
+
+  it('should find agent by group', async () => {
     // given
     const patterns = agentGroup({
       authorization: variable('authorization'),
