@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 1.2.2
+
+### Patch Changes
+
+- 0495d3f: `lib` dir was missing from built package
+
 ## 1.2.0
 
 ### Minor Changes
