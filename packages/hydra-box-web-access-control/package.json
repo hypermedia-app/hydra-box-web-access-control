@@ -2,7 +2,7 @@
   "name": "hydra-box-web-access-control",
   "version": "1.1.4",
   "description": "Using W3C Web Access Control vocabulary to protect Hydra APIs",
-  "main": "main.js",
+  "main": "index.js",
   "module": "index.js",
   "types": "index.d.ts",
   "files": [
