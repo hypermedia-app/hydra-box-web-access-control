@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 1.2.3
+
+### Patch Changes
+
+- e80dafa: fix: [DEP0128] DeprecationWarning: Invalid 'main' field
+
 ## 1.2.2
 
 ### Patch Changes

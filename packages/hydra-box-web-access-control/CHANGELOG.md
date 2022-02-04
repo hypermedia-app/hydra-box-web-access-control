@@ -1,5 +1,13 @@
 # hydra-box-web-access-control
 
+## 1.1.5
+
+### Patch Changes
+
+- e80dafa: fixes [DEP0128] DeprecationWarning: Invalid 'main' field
+- Updated dependencies [e80dafa]
+  - rdf-web-access-control@1.2.3
+
 ## 1.1.4
 
 ### Patch Changes
