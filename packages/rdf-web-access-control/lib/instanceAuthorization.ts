@@ -6,12 +6,13 @@ import type { AuthorizationPatterns, ResourceCheck } from '..'
 import { agentClasses, combinePatterns, onlyNamedNodes } from '.'
 
 export function instanceAuthorization(
-  { agent, accessMode, term, additionalPatterns = [] }: Omit<ResourceCheck, 'client'>,
+  { agent, accessMode, term: terms, additionalPatterns = [] }: Omit<ResourceCheck, 'client'>,
   authorizationChecks: AuthorizationPatterns[],
 ): SparqlAskExecutable {
   const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
   const authorization = variable('authorization')
   const check = { authorization, agent: variable('agent'), agentClass: variable('agentClass') }
+  const term = variable('term')
 
   const patternUnion = authorizationChecks.reduce((previous, buildPatterns) => {
     return sparql`${previous}
@@ -40,6 +41,7 @@ export function instanceAuthorization(
     VALUES ?mode { ${acl.Control} ${accessMode} }
     VALUES ?agent { ${agentTerm || '<>'} }
     VALUES ?agentClass { ${foaf.Agent} ${agentClasses(agent).filter(onlyNamedNodes)} }
+    VALUES ?term { ${terms} }
 
     ${patternUnion}`
 }

@@ -50,7 +50,7 @@ export default ({ client, additionalPatterns, additionalChecks }: Option): expre
   }
 
   const result = await check({
-    term: req.hydra.term,
+    term: [req.hydra.term, req.hydra.resource.term],
     accessMode,
     client,
     agent: req.agent,

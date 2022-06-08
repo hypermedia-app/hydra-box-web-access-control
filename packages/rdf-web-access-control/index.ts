@@ -29,7 +29,7 @@ export interface Check {
 }
 
 export interface ResourceCheck extends Check {
-  term: NamedNode
+  term: NamedNode | NamedNode[]
 }
 
 export interface TypeCheck extends Check {

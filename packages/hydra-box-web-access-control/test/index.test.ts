@@ -16,13 +16,16 @@ describe('hydra-box-web-access-control', () => {
   let aclSpy: sinon.SinonStubbedInstance<typeof acl>
   const client = {} as any
   const term = $rdf.namedNode('http://example.com/resource')
+  const resourceTerm = $rdf.namedNode('http://example.com/resource2')
 
   beforeEach(() => {
     app = express()
     app.use(function hydraBoxMock(req, res, next) {
       req.hydra = {
         term,
-        resource: {},
+        resource: {
+          term: resourceTerm,
+        },
       } as any
       next()
     })
@@ -54,7 +57,7 @@ describe('hydra-box-web-access-control', () => {
     expect(acl.check).to.have.been.calledWith(sinon.match({
       client,
       agent,
-      term,
+      term: [term, resourceTerm],
       additionalPatterns: sinon.match.array,
     }))
   })
