@@ -45,6 +45,32 @@ describe('rdf-web-access-control', () => {
           expect(hasAccess).to.be.true
         })
 
+        it('should be granted if one of multiple matches', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: [resource.Kripke, resource.Penny],
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+          })
+
+          // then
+          expect(hasAccess).to.be.true
+        })
+
+        it('should not be granted if no ACL exists', async () => {
+          // when
+          const hasAccess = await check({
+            client,
+            accessMode: acl.Write,
+            term: resource.Kripke,
+            agent: clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+          })
+
+          // then
+          expect(hasAccess).to.be.false
+        })
+
         it('should not be granted if additional pattern is not matched', async () => {
           // when
           const hasAccess = await check({
