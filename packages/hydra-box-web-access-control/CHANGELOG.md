@@ -1,5 +1,16 @@
 # hydra-box-web-access-control
 
+## 1.2.0
+
+### Minor Changes
+
+- 5d51eed: False-negative authorization result in cases when the hydra-box `ResourceLoader` choose a resource with different identifier than the request URL
+
+### Patch Changes
+
+- Updated dependencies [5d51eed]
+  - rdf-web-access-control@1.3.0
+
 ## 1.1.5
 
 ### Patch Changes
