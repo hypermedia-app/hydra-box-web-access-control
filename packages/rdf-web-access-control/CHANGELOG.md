@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 1.3.0
+
+### Minor Changes
+
+- 5d51eed: Support for multiple terms being checked at the same time to see if either matches
+
 ## 1.2.3
 
 ### Patch Changes
