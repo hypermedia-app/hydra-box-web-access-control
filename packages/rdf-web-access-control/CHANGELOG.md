@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 1.3.1
+
+### Patch Changes
+
+- b2f6f1b: Remove TS sources from published packages
+
 ## 1.3.0
 
 ### Minor Changes
