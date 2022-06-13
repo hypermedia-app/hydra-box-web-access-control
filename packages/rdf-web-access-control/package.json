@@ -6,7 +6,8 @@
   "module": "index.js",
   "types": "index.d.ts",
   "files": [
-    "lib",
+    "lib/*.js",
+    "lib/*.d.ts",
     "*.js",
     "*.d.ts"
   ],
