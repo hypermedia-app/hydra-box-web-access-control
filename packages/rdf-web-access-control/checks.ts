@@ -1,5 +1,5 @@
 import { sparql } from '@tpluscode/sparql-builder'
-import { acl, vcard } from '@tpluscode/rdf-ns-builders/strict'
+import { acl, vcard } from '@tpluscode/rdf-ns-builders'
 import type { AuthorizationPatterns } from '.'
 
 export const agentClass: AuthorizationPatterns = ({ authorization, agentClass }) => {

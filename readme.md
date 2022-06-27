@@ -188,7 +188,7 @@ As an example, below is the implementation of using `acl:agentGroup`. It can be 
 
 ```typescript
 import { sparql } from '@tpluscode/sparql-builder'
-import { acl, vcard } from '@tpluscode/rdf-ns-builders/strict'
+import { acl, vcard } from '@tpluscode/rdf-ns-builders'
 import type { AuthorizationPatterns } from 'rdf-web-access-control'
 
 export const agentGroup: AuthorizationPatterns = ({ agent, authorization }) => {

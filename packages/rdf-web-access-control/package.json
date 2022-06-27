@@ -17,8 +17,8 @@
   "dependencies": {
     "@rdfjs/data-model": "^1.2.0",
     "@rdfjs/types": "*",
-    "@tpluscode/rdf-ns-builders": "^1.0.0",
-    "@tpluscode/sparql-builder": "^0.3.14"
+    "@tpluscode/rdf-ns-builders": "^2.0.0",
+    "@tpluscode/sparql-builder": "^0.3.22"
   },
   "devDependencies": {
     "@rdfjs/namespace": "^1.1.0",

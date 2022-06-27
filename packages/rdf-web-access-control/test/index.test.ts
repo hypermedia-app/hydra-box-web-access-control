@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha'
-import { acl, prov, rdf, schema } from '@tpluscode/rdf-ns-builders'
+import { acl, prov, rdf, schema } from '@tpluscode/rdf-ns-builders/loose'
 import clownface from 'clownface'
 import $rdf from 'rdf-ext'
 import { expect } from 'chai'
