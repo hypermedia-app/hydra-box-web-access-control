@@ -1,5 +1,13 @@
 # hydra-box-web-access-control
 
+## 1.2.1
+
+### Patch Changes
+
+- ba9e549: Updated `@tpluscode/rdf-ns-builders` to v2
+- Updated dependencies [ba9e549]
+  - rdf-web-access-control@1.3.2
+
 ## 1.2.0
 
 ### Minor Changes
