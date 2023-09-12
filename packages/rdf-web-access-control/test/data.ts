@@ -1,13 +1,16 @@
 import fs from 'fs'
 import path from 'path'
+import * as url from 'url'
 import StreamClient from 'sparql-http-client'
-import ParsingClient from 'sparql-http-client/ParsingClient'
+import ParsingClient from 'sparql-http-client/ParsingClient.js'
 import * as compose from 'docker-compose'
 import waitOn from 'wait-on'
 import { Context } from 'mocha'
-import namespace from '@rdfjs/namespace'
+import rdf from '@zazuko/env'
 
-export const resource = namespace('http://example.com/')
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url))
+
+export const resource = rdf.namespace('http://example.com/')
 
 const endpoint = {
   endpointUrl: 'http://localhost:3030/wac/query',

@@ -2,7 +2,7 @@ import { Term, Variable } from '@rdfjs/types'
 import type { GraphPointer } from 'clownface'
 import { acl, rdf } from '@tpluscode/rdf-ns-builders'
 import { sparql, SparqlTemplateResult } from '@tpluscode/sparql-builder'
-import type { Check } from '..'
+import type { Check } from '../index.js'
 
 export function onlyNamedNodes({ termType }: Term): boolean {
   return termType === 'NamedNode'
