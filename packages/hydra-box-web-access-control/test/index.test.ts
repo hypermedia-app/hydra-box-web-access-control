@@ -1,24 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import module from 'module'
 import { NamedNode } from '@rdfjs/types'
-import { describe, it, beforeEach } from 'mocha'
 import express, { Express } from 'express'
 import request from 'supertest'
 import httpStatus from 'http-status'
-import * as acl from 'rdf-web-access-control'
 import sinon from 'sinon'
 import { expect } from 'chai'
 import * as ns from '@tpluscode/rdf-ns-builders/loose'
-import clownface from 'clownface'
-import $rdf from 'rdf-ext'
-import accessControl from '..'
+import $rdf from '@zazuko/env'
+import esmock from 'esmock'
+import AccessControl from '../index.js'
+
+const require = module.createRequire(import.meta.url)
 
 describe('hydra-box-web-access-control', () => {
   let app: Express
-  let aclSpy: sinon.SinonStubbedInstance<typeof acl>
+  let acl: sinon.SinonStubbedInstance<typeof import('rdf-web-access-control')>
+  let accessControl: typeof AccessControl
   const client = {} as any
   const term = $rdf.namedNode('http://example.com/resource')
   const resourceTerm = $rdf.namedNode('http://example.com/resource2')
 
-  beforeEach(() => {
+  beforeEach(async () => {
     app = express()
     app.use(function hydraBoxMock(req, res, next) {
       req.hydra = {
@@ -30,7 +33,10 @@ describe('hydra-box-web-access-control', () => {
       next()
     })
 
-    aclSpy = sinon.stub(acl)
+    acl = { check: sinon.stub() }
+    ;({ default: accessControl } = await esmock('../index.ts', {
+      [require.resolve('rdf-web-access-control')]: acl,
+    }))
   })
 
   afterEach(() => {
@@ -40,7 +46,7 @@ describe('hydra-box-web-access-control', () => {
   it('passes right parameters to check', async () => {
     // given
     const additionalPatterns = sinon.stub()
-    const agent = clownface({ dataset: $rdf.dataset() }).namedNode('')
+    const agent = $rdf.clownface({ dataset: $rdf.dataset() }).namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
       next()
@@ -67,7 +73,7 @@ describe('hydra-box-web-access-control', () => {
     app.use(accessControl({
       client,
     }))
-    aclSpy.check.resolves(false)
+    acl.check.resolves(false)
 
     // when
     const response = request(app).get('/resource')
@@ -78,7 +84,7 @@ describe('hydra-box-web-access-control', () => {
 
   it('responds 403 when access is not granted and a user is authenticated', async () => {
     // given
-    const agent = clownface({ dataset: $rdf.dataset() }).namedNode('')
+    const agent = $rdf.clownface({ dataset: $rdf.dataset() }).namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
       next()
@@ -86,7 +92,7 @@ describe('hydra-box-web-access-control', () => {
     app.use(accessControl({
       client,
     }))
-    aclSpy.check.resolves(false)
+    acl.check.resolves(false)
 
     // when
     const response = request(app).get('/resource')
@@ -106,7 +112,7 @@ describe('hydra-box-web-access-control', () => {
     app.use(accessControl({
       client,
     }))
-    aclSpy.check.resolves(false)
+    acl.check.resolves(false)
 
     // when
     await request(app).get('/resource')
@@ -117,7 +123,7 @@ describe('hydra-box-web-access-control', () => {
 
   it('responds 200 when access is granted', async () => {
     // given
-    aclSpy.check.resolves(true)
+    acl.check.resolves(true)
     app.use(accessControl({
       client,
     }))
@@ -133,7 +139,7 @@ describe('hydra-box-web-access-control', () => {
   it('uses acl mode from hydra operation', async () => {
     // given
     app.use((req, res, next) => {
-      req.hydra.operation = clownface({ dataset: $rdf.dataset() })
+      req.hydra.operation = $rdf.clownface({ dataset: $rdf.dataset() })
         .blankNode()
         .addOut(ns.acl.mode, ns.acl.Delete)
       next()
@@ -178,7 +184,7 @@ describe('hydra-box-web-access-control', () => {
   for (const [method, accessMode] of mappedMethods) {
     it(`maps method ${method} to mode ${accessMode.value}`, async () => {
       // given
-      aclSpy.check.resolves(true)
+      acl.check.resolves(true)
       app.use(accessControl({
         client,
       }))

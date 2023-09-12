@@ -2,9 +2,9 @@ import { DatasetCore, NamedNode, Term, Variable } from '@rdfjs/types'
 import { SparqlTemplateResult } from '@tpluscode/sparql-builder'
 import type { StreamClient } from 'sparql-http-client/StreamClient'
 import type { GraphPointer } from 'clownface'
-import * as checks from './checks'
-import { typeAuthorization } from './lib/typeAuthorization'
-import { instanceAuthorization } from './lib/instanceAuthorization'
+import * as checks from './checks.js'
+import { typeAuthorization } from './lib/typeAuthorization.js'
+import { instanceAuthorization } from './lib/instanceAuthorization.js'
 
 export interface AdditionalPatterns {
   (acl: Variable): SparqlTemplateResult | string

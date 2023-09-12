@@ -1,18 +1,18 @@
-import { variable } from '@rdfjs/data-model'
+import rdf from '@rdfjs/data-model'
 import { ASK, sparql } from '@tpluscode/sparql-builder'
 import { acl, foaf } from '@tpluscode/rdf-ns-builders'
 import type { SparqlAskExecutable } from '@tpluscode/sparql-builder/lib'
-import type { AuthorizationPatterns, ResourceCheck } from '..'
-import { agentClasses, combinePatterns, onlyNamedNodes } from '.'
+import type { AuthorizationPatterns, ResourceCheck } from '../index.js'
+import { agentClasses, combinePatterns, onlyNamedNodes } from './index.js'
 
 export function instanceAuthorization(
   { agent, accessMode, term: terms, additionalPatterns = [] }: Omit<ResourceCheck, 'client'>,
   authorizationChecks: AuthorizationPatterns[],
 ): SparqlAskExecutable {
   const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
-  const authorization = variable('authorization')
-  const check = { authorization, agent: variable('agent'), agentClass: variable('agentClass') }
-  const term = variable('term')
+  const authorization = rdf.variable('authorization')
+  const check = { authorization, agent: rdf.variable('agent'), agentClass: rdf.variable('agentClass') }
+  const term = rdf.variable('term')
 
   const values = sparql`
     VALUES ?mode { ${acl.Control} ${accessMode} }
