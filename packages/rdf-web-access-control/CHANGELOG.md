@@ -1,5 +1,11 @@
 # rdf-web-access-control
 
+## 2.0.0
+
+### Major Changes
+
+- 6dd2dce: Update to ESM
+
 ## 1.4.0
 
 ### Minor Changes
