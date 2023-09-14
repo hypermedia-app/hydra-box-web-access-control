@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import module from 'module'
 import { NamedNode } from '@rdfjs/types'
 import express, { Express } from 'express'
 import request from 'supertest'
@@ -10,8 +9,6 @@ import * as ns from '@tpluscode/rdf-ns-builders/loose'
 import $rdf from '@zazuko/env'
 import esmock from 'esmock'
 import AccessControl from '../index.js'
-
-const require = module.createRequire(import.meta.url)
 
 describe('hydra-box-web-access-control', () => {
   let app: Express
@@ -34,8 +31,8 @@ describe('hydra-box-web-access-control', () => {
     })
 
     acl = { check: sinon.stub() }
-    ;({ default: accessControl } = await esmock('../index.ts', {
-      [require.resolve('rdf-web-access-control')]: acl,
+    ;({ default: accessControl } = await esmock('../index.js', {
+      'rdf-web-access-control': acl,
     }))
   })
 
