@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NamedNode } from '@rdfjs/types'
-import { describe, it, beforeEach } from 'mocha'
 import express, { Express } from 'express'
 import request from 'supertest'
 import httpStatus from 'http-status'
@@ -10,12 +10,11 @@ import $rdf from '@zazuko/env'
 import { HydraBox } from '@kopflos-cms/core'
 import type StreamClient from 'sparql-http-client/StreamClient.js'
 import esmock from 'esmock'
-import type AccessControl from '../index.js'
 
 describe('hydra-box-web-access-control', () => {
   let app: Express
-  let acl: { check: sinon.SinonStub }
-  let accessControl!: typeof AccessControl
+  let acl: sinon.SinonStubbedInstance<typeof import('rdf-web-access-control')>
+  let accessControl: (typeof import('../index.js').default)
   const client = {} as unknown as StreamClient
   const term = $rdf.namedNode('http://example.com/resource')
   const resourceTerm = $rdf.namedNode('http://example.com/resource2')

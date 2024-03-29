@@ -1,4 +1,3 @@
-import { describe, it } from 'mocha'
 import { acl, prov, rdf, schema } from '@tpluscode/rdf-ns-builders/loose'
 import $rdf from '@zazuko/env'
 import { expect } from 'chai'

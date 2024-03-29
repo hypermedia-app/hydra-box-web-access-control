@@ -1,5 +1,5 @@
-import fs from 'fs'
-import path from 'path'
+import fs from 'node:fs'
+import path from 'node:path'
 import * as url from 'node:url'
 import StreamClient from 'sparql-http-client'
 import ParsingClient from 'sparql-http-client/ParsingClient.js'

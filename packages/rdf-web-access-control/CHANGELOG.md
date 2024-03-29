@@ -1,5 +1,17 @@
 # rdf-web-access-control
 
+## 2.0.0
+
+### Major Changes
+
+- 6dd2dce: Update to ESM
+
+## 1.4.0
+
+### Minor Changes
+
+- 6b3fb65: Inline the `VALUES` clauses inside every `UNION` to improve performance when store does "bottom-up" query evaluation
+
 ## 1.3.2
 
 ### Patch Changes

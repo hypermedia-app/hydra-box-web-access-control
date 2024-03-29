@@ -14,10 +14,19 @@ export function instanceAuthorization(
   const check = { authorization, agent: rdf.variable('agent'), agentClass: rdf.variable('agentClass') }
   const term = rdf.variable('term')
 
-  const patternUnion = authorizationChecks.reduce((previous, buildPatterns) => {
+  const values = sparql`
+    VALUES ?mode { ${acl.Control} ${accessMode} }
+    VALUES ?agent { ${agentTerm || '<>'} }
+    VALUES ?agentClass { ${foaf.Agent} ${agentClasses(agent).filter(onlyNamedNodes)} }
+    VALUES ?term { ${terms} }
+  `
+
+  return ASK`${(authorizationChecks.reduce((previous, buildPatterns) => {
     return sparql`${previous}
     UNION
     {
+      ${values}
+
       ${authorization} a ${acl.Authorization} ;
                      ${acl.mode} ?mode ;
                      ${acl.accessTo} ${term} .
@@ -26,6 +35,8 @@ export function instanceAuthorization(
     }
     UNION
     {
+      ${values}
+
       ${term} a ?type .
       ${authorization} a ${acl.Authorization} ;
                      ${acl.mode} ?mode ;
@@ -34,14 +45,8 @@ export function instanceAuthorization(
       ${combinePatterns(additionalPatterns, authorization)}
     }`
   }, sparql`{
+    ${values}
+
     ${term} ${acl.owner} ?agent .
-  }`)
-
-  return ASK`
-    VALUES ?mode { ${acl.Control} ${accessMode} }
-    VALUES ?agent { ${agentTerm || '<>'} }
-    VALUES ?agentClass { ${foaf.Agent} ${agentClasses(agent).filter(onlyNamedNodes)} }
-    VALUES ?term { ${terms} }
-
-    ${patternUnion}`
+  }`))}`
 }

@@ -1,5 +1,16 @@
 # hydra-box-web-access-control
 
+## 2.0.0
+
+### Major Changes
+
+- 6dd2dce: Update to ESM
+
+### Patch Changes
+
+- Updated dependencies [6dd2dce]
+  - rdf-web-access-control@2.0.0
+
 ## 1.2.1
 
 ### Patch Changes
