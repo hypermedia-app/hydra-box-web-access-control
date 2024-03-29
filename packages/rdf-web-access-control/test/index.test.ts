@@ -2,7 +2,7 @@ import { acl, prov, rdf, schema } from '@tpluscode/rdf-ns-builders/loose'
 import $rdf from '@zazuko/env'
 import { expect } from 'chai'
 import { INSERT, sparql } from '@tpluscode/sparql-builder'
-import { Variable } from '@rdfjs/types'
+import type { Variable } from '@rdfjs/types'
 import { check } from '../index.js'
 import { agentGroup } from '../checks.js'
 import { client, insertAcls, insertData, resource } from './data.js'
@@ -25,7 +25,7 @@ describe('rdf-web-access-control', () => {
         GRAPH ?acl {
           ?acl a ${acl.Authorization} .
         }
-      `.execute(client.query)
+      `.execute(client)
     }
 
     describe('ResourceCheck', () => {
@@ -36,7 +36,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Penny,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            agent: $rdf.clownface({ term: resource.Leonard }),
           })
 
           // then
@@ -49,7 +49,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: [resource.Kripke, resource.Penny],
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            agent: $rdf.clownface({ term: resource.Leonard }),
           })
 
           // then
@@ -62,7 +62,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Kripke,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            agent: $rdf.clownface({ term: resource.Leonard }),
           })
 
           // then
@@ -75,7 +75,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Penny,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            agent: $rdf.clownface({ term: resource.Leonard }),
             additionalPatterns,
           })
 
@@ -92,7 +92,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Penny,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Leonard }),
+            agent: $rdf.clownface({ term: resource.Leonard }),
             additionalPatterns,
           })
 
@@ -107,7 +107,7 @@ describe('rdf-web-access-control', () => {
           client,
           accessMode: acl.Write,
           term: resource.Penny,
-          agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Leonard })
+          agent: $rdf.clownface({ term: resource.Leonard })
             .addOut(rdf.type, $rdf.blankNode()),
         })
 
@@ -122,7 +122,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.Caltech,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            agent: $rdf.clownface({ term: resource.Sheldon }),
           })
 
           // then
@@ -138,7 +138,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.Caltech,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            agent: $rdf.clownface({ term: resource.Sheldon }),
             additionalPatterns,
           })
 
@@ -152,7 +152,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.Caltech,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            agent: $rdf.clownface({ term: resource.Sheldon }),
             additionalPatterns,
           })
 
@@ -211,7 +211,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.PrivateReport,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            agent: $rdf.clownface({ term: resource.Howard }),
           })
 
           // then
@@ -227,7 +227,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.PrivateReport,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            agent: $rdf.clownface({ term: resource.Howard }),
             additionalPatterns,
           })
 
@@ -241,7 +241,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.PrivateReport,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            agent: $rdf.clownface({ term: resource.Howard }),
             additionalPatterns,
           })
 
@@ -257,7 +257,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Comment,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            agent: $rdf.clownface({ term: resource.Howard })
               .addOut(rdf.type, schema.Employee),
           })
 
@@ -274,7 +274,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Comment,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            agent: $rdf.clownface({ term: resource.Howard })
               .addOut(rdf.type, schema.Employee),
             additionalPatterns,
           })
@@ -289,7 +289,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Write,
             term: resource.Comment,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            agent: $rdf.clownface({ term: resource.Howard })
               .addOut(rdf.type, schema.Employee),
             additionalPatterns,
           })
@@ -305,7 +305,7 @@ describe('rdf-web-access-control', () => {
           client,
           accessMode: acl.Read,
           term: resource.Foobar,
-          agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+          agent: $rdf.clownface({ term: resource.Sheldon }),
         })
 
         // then
@@ -319,7 +319,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.PrivateReport,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Penny }),
+            agent: $rdf.clownface({ term: resource.Penny }),
             additionalChecks: [({ authorization, agent }) => sparql`${authorization} ${acl.accessTo}/${resource.sharedWith} ${agent}`],
           })
 
@@ -333,7 +333,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.PrivateReport,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Penny }),
+            agent: $rdf.clownface({ term: resource.Penny }),
             additionalChecks: [agentGroup],
           })
 
@@ -347,7 +347,7 @@ describe('rdf-web-access-control', () => {
             client,
             accessMode: acl.Read,
             term: resource.PrivateReport,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Sheldon }),
+            agent: $rdf.clownface({ term: resource.Sheldon }),
             additionalChecks: [agentGroup],
           })
 
@@ -364,7 +364,7 @@ describe('rdf-web-access-control', () => {
           const hasAccess = await check({
             client,
             accessMode: acl.Write,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            agent: $rdf.clownface({ term: resource.Howard })
               .addOut(rdf.type, schema.Employee),
             types: [schema.Comment],
           })
@@ -381,7 +381,7 @@ describe('rdf-web-access-control', () => {
           const hasAccess = await check({
             client,
             accessMode: acl.Write,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            agent: $rdf.clownface({ term: resource.Howard })
               .addOut(rdf.type, schema.Employee),
             types: [schema.Comment],
             additionalPatterns,
@@ -396,7 +396,7 @@ describe('rdf-web-access-control', () => {
           const hasAccess = await check({
             client,
             accessMode: acl.Write,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+            agent: $rdf.clownface({ term: resource.Howard })
               .addOut(rdf.type, schema.Employee),
             types: [schema.Comment],
             additionalPatterns,
@@ -412,7 +412,7 @@ describe('rdf-web-access-control', () => {
         const hasAccess = await check({
           client,
           accessMode: acl.Write,
-          agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard })
+          agent: $rdf.clownface({ term: resource.Howard })
             .addOut(rdf.type, schema.Employee)
             .addOut(rdf.type, $rdf.blankNode()),
           types: [schema.Comment, $rdf.blankNode()],
@@ -428,7 +428,7 @@ describe('rdf-web-access-control', () => {
           const hasAccess = await check({
             client,
             accessMode: acl.Write,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            agent: $rdf.clownface({ term: resource.Howard }),
             types: [schema.ScholarlyArticle],
           })
 
@@ -444,7 +444,7 @@ describe('rdf-web-access-control', () => {
           const hasAccess = await check({
             client,
             accessMode: acl.Write,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            agent: $rdf.clownface({ term: resource.Howard }),
             types: [schema.ScholarlyArticle],
             additionalPatterns,
           })
@@ -458,7 +458,7 @@ describe('rdf-web-access-control', () => {
           const hasAccess = await check({
             client,
             accessMode: acl.Write,
-            agent: $rdf.clownface({ dataset: $rdf.dataset(), term: resource.Howard }),
+            agent: $rdf.clownface({ term: resource.Howard }),
             types: [schema.ScholarlyArticle],
             additionalPatterns,
           })

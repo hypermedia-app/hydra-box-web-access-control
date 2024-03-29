@@ -1,6 +1,6 @@
-import fs from 'fs'
-import path from 'path'
-import * as url from 'url'
+import fs from 'node:fs'
+import path from 'node:path'
+import * as url from 'node:url'
 import StreamClient from 'sparql-http-client'
 import ParsingClient from 'sparql-http-client/ParsingClient.js'
 import * as compose from 'docker-compose'
@@ -24,7 +24,9 @@ export const parsingClient = new ParsingClient(endpoint)
 
 export async function insertData(this: Context) {
   this.timeout(200000)
-  await compose.upAll()
+  await compose.upAll({
+    cwd: path.resolve(__dirname, '../../..'),
+  })
   await waitOn({
     resources: ['http://localhost:3030'],
   })

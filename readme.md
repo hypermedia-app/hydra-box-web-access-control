@@ -17,9 +17,9 @@ See below for more details.
 
 Check the [examples](./examples/acls.ru) file for various instances of `acl:Autorization` resources. 
 
-## hydra-box-web-access-control
+## hydra-web-access-control
 
-Protects [Hydra APIs](http://www.hydra-cg.com/spec/latest/core/) running [hydra-box](https://npm.im/hydra-box).
+Protects [Hydra APIs](http://www.hydra-cg.com/spec/latest/core/) running [kopflos](https://github.com/zazuko/kopflos).
 
 Instances of `hydra:Operation` can be annotated with a `acl:mode` property to force this access mode being checked:
 
@@ -52,12 +52,10 @@ The setup requires creating an express middleware by providing a SPARQL client i
 
 ```typescript
 import express from 'express'
-import clownface from 'clownface'
-import $rdf from 'rdf-ext'
 import { rdf, acl } from '@tpluscode/rdf-ns-builders'
 import SparqlClient from 'sparql-http-client'
-import * as hydraBox from 'hydra-box'
-import accessControl from 'hydra-box-web-access-control' 
+import * as kopflos from '@kopflos-api/core'
+import accessControl from 'hydra-web-access-control' 
  
 const app = express()
 
@@ -71,7 +69,7 @@ app.use((req, res, next) => {
   // in this example it creates a user by hand, 
   // from info provided by express-basic-auth.
   // typically, would load from a store
-  req.agent = clownface({ dataset: $rdf.dataset() })
+  req.agent = req.env.clownface()
     .namedNode(`urn:user:${req.auth.user}`)
     .addOut(rdf.type, acl.AuthenticatedAgent)
   
@@ -94,7 +92,7 @@ app.use(hydraBox.middleware(api, {
 A function of array of functions can be optionally passed to the middleware. They take an RDF/JS variable, and the current request object as parameters and should return additional SPARQL patterns to filter out ACL authorization resources as desired.
 
 ```typescript
-import accessControl from 'hydra-box-web-access-control'
+import accessControl from 'hydra-access-control'
 import { Variable } from '@rdfjs/types'
 import { Request } from 'express'
 
@@ -110,7 +108,7 @@ See [below](#additional-authorization-restrictions) for a complete example. The 
 
 ## rdf-web-access-control
 
-The underlying library used by `hydra-box-web-access-control` middleware.
+The underlying library used by `hydra-web-access-control` middleware.
 
 ### Check user access to resource
 
@@ -223,4 +221,4 @@ const hasAccess: boolean = check({
 
 It is also possible to pass an array of multiple such SPARQL-building functions.
 
-Similar applies to configuring the `hydra-box-web-access-control` middleware.
+Similar applies to configuring the `hydra-web-access-control` middleware.

@@ -7,14 +7,15 @@ import sinon from 'sinon'
 import { expect } from 'chai'
 import * as ns from '@tpluscode/rdf-ns-builders/loose'
 import $rdf from '@zazuko/env'
+import { HydraBox } from '@kopflos-cms/core'
+import type StreamClient from 'sparql-http-client/StreamClient.js'
 import esmock from 'esmock'
-import AccessControl from '../index.js'
 
 describe('hydra-box-web-access-control', () => {
   let app: Express
   let acl: sinon.SinonStubbedInstance<typeof import('rdf-web-access-control')>
-  let accessControl: typeof AccessControl
-  const client = {} as any
+  let accessControl: (typeof import('../index.js').default)
+  const client = {} as unknown as StreamClient
   const term = $rdf.namedNode('http://example.com/resource')
   const resourceTerm = $rdf.namedNode('http://example.com/resource2')
 
@@ -26,14 +27,16 @@ describe('hydra-box-web-access-control', () => {
         resource: {
           term: resourceTerm,
         },
-      } as any
+      } as unknown as HydraBox
       next()
     })
 
-    acl = { check: sinon.stub() }
-    ;({ default: accessControl } = await esmock('../index.js', {
+    acl = {
+      check: sinon.stub(),
+    }
+    accessControl = await esmock('../index.js', {
       'rdf-web-access-control': acl,
-    }))
+    })
   })
 
   afterEach(() => {
@@ -43,7 +46,7 @@ describe('hydra-box-web-access-control', () => {
   it('passes right parameters to check', async () => {
     // given
     const additionalPatterns = sinon.stub()
-    const agent = $rdf.clownface({ dataset: $rdf.dataset() }).namedNode('')
+    const agent = $rdf.clownface().namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
       next()
@@ -59,7 +62,7 @@ describe('hydra-box-web-access-control', () => {
     // then
     expect(acl.check).to.have.been.calledWith(sinon.match({
       client,
-      agent,
+      agent: sinon.match.same(agent),
       term: [term, resourceTerm],
       additionalPatterns: sinon.match.array,
     }))
@@ -81,7 +84,7 @@ describe('hydra-box-web-access-control', () => {
 
   it('responds 403 when access is not granted and a user is authenticated', async () => {
     // given
-    const agent = $rdf.clownface({ dataset: $rdf.dataset() }).namedNode('')
+    const agent = $rdf.clownface().namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
       next()
@@ -136,7 +139,7 @@ describe('hydra-box-web-access-control', () => {
   it('uses acl mode from hydra operation', async () => {
     // given
     app.use((req, res, next) => {
-      req.hydra.operation = $rdf.clownface({ dataset: $rdf.dataset() })
+      req.hydra.operation = $rdf.clownface()
         .blankNode()
         .addOut(ns.acl.mode, ns.acl.Delete)
       next()

@@ -13,22 +13,25 @@
   ],
   "scripts": {
     "prepack": "tsc",
-    "test": "mocha --package ../../package.json test"
+    "test": "mocha"
   },
   "dependencies": {
     "@rdfjs/data-model": "^2.0.1",
     "@rdfjs/types": "*",
-    "@tpluscode/rdf-ns-builders": "3 - 4",
-    "@tpluscode/sparql-builder": "^1.1.0"
+    "@tpluscode/rdf-ns-builders": "^4.3.0",
+    "@tpluscode/sparql-builder": "^2.0.2"
+  },
+  "peerDependencies": {
+    "sparql-http-client": "^3.0.0"
   },
   "devDependencies": {
-    "@zazuko/env": "^1.1.1",
     "@types/wait-on": "^5.2.0",
+    "@zazuko/env": "^2.1.0",
     "chai": "^4.3.4",
-    "docker-compose": "^0.23.6",
-    "mocha": "^10.2.0",
-    "sinon": "^15.2.0",
-    "sparql-http-client": "^2.2.3",
+    "docker-compose": "^0.24.7",
+    "mocha": "^10.4.0",
+    "sinon": "^17.0.1",
+    "sparql-http-client": "^3.0.0",
     "wait-on": "^5.3.0"
   },
   "repository": {
@@ -41,5 +44,13 @@
   "bugs": {
     "url": "https://github.com/hypermedia-app/web-access-control/issues"
   },
-  "homepage": "https://github.com/hypermedia-app/web-access-control#rdf-web-access-control"
+  "homepage": "https://github.com/hypermedia-app/web-access-control#rdf-web-access-control",
+  "mocha": {
+    "extension": ["ts"],
+    "recursive": true,
+    "loader": "ts-node/esm",
+    "require": [
+      "../../../../mocha-setup.js"
+    ]
+  }
 }

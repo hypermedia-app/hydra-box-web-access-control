@@ -1,5 +1,5 @@
 {
-  "name": "hydra-box-web-access-control",
+  "name": "hydra-web-access-control",
   "version": "2.0.0",
   "description": "Using W3C Web Access Control vocabulary to protect Hydra APIs",
   "main": "index.js",
@@ -11,39 +11,46 @@
   ],
   "scripts": {
     "prepack": "tsc",
-    "test": "mocha --package ../../package.json test"
+    "test": "mocha"
   },
   "dependencies": {
     "@rdfjs/types": "*",
-    "@tpluscode/rdf-ns-builders": "3 - 4",
-    "@types/hydra-box": "*",
+    "@tpluscode/rdf-ns-builders": "^4.3.0",
     "http-errors": "^2.0.0",
-    "middleware-async": "^1.3.1",
+    "middleware-async": "^1.4.0",
     "rdf-web-access-control": "^2.0.0"
   },
   "devDependencies": {
-    "@types/supertest": "^2.0.11",
-    "@zazuko/env": "^1.1.1",
+    "@types/supertest": "^6.0.2",
+    "@zazuko/env": "^2.1.0",
     "chai": "^4.3.4",
-    "esmock": "^2.5.1",
+    "esmock": "^2.6.4",
     "express": "^4.17.1",
-    "http-status": "^1.5.0",
-    "mocha": "^10.2.0",
-    "sinon": "^15.2.0",
-    "supertest": "^6.1.3"
+    "http-status": "^1.7.4",
+    "mocha": "^10.0.0",
+    "sinon": "^17.0.1",
+    "supertest": "^6.3.4"
   },
   "peerDependencies": {
-    "hydra-box": "^0.6.3"
+    "@kopflos-cms/core": "^0.1.1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hypermedia-app/web-access-control.git",
-    "directory": "packages/hydra-box-web-access-control"
+    "directory": "packages/hydra-web-access-control"
   },
   "author": "Tomasz Pluskiewicz",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/hypermedia-app/web-access-control/issues"
   },
-  "homepage": "https://github.com/hypermedia-app/web-access-control#hydra-box-web-access-control"
+  "homepage": "https://github.com/hypermedia-app/web-access-control#hydra-web-access-control",
+  "mocha": {
+    "extension": ["ts"],
+    "recursive": true,
+    "loader": "ts-node/esm",
+    "require": [
+      "../../../../mocha-setup.js"
+    ]
+  }
 }

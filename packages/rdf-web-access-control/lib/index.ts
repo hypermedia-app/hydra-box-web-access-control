@@ -1,4 +1,4 @@
-import { Term, Variable } from '@rdfjs/types'
+import type { Term, Variable } from '@rdfjs/types'
 import type { GraphPointer } from 'clownface'
 import { acl, rdf } from '@tpluscode/rdf-ns-builders'
 import { sparql, SparqlTemplateResult } from '@tpluscode/sparql-builder'

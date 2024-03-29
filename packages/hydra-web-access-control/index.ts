@@ -1,6 +1,8 @@
+/// <reference types="@kopflos-cms/core/middleware.js" />
+
 import asyncMiddleware from 'middleware-async'
 import error from 'http-errors'
-import type { StreamClient } from 'sparql-http-client/StreamClient'
+import type StreamClient from 'sparql-http-client/StreamClient.js'
 import type * as express from 'express'
 import { acl } from '@tpluscode/rdf-ns-builders'
 import { check, AdditionalPatterns, Check } from 'rdf-web-access-control'

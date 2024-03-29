@@ -1,7 +1,7 @@
 import rdf from '@rdfjs/data-model'
 import { ASK, sparql, SparqlTemplateResult } from '@tpluscode/sparql-builder'
 import { acl, foaf, rdfs } from '@tpluscode/rdf-ns-builders'
-import type { SparqlAskExecutable } from '@tpluscode/sparql-builder/lib'
+import type { SparqlAskExecutable } from '@tpluscode/sparql-builder'
 import type { AuthorizationPatterns, TypeCheck } from '../index.js'
 import { agentClasses, combinePatterns, onlyNamedNodes } from './index.js'
 
