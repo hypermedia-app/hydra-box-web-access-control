@@ -21,6 +21,9 @@
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "@tpluscode/sparql-builder": "^2.0.2"
   },
+  "peerDependencies": {
+    "sparql-http-client": "^3.0.0"
+  },
   "devDependencies": {
     "@types/wait-on": "^5.2.0",
     "@zazuko/env": "^2.1.0",
