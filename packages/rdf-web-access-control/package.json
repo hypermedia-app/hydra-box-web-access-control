@@ -1,6 +1,6 @@
 {
   "name": "rdf-web-access-control",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Run SPARQL queries to check resource access using Web Access Control vocabulary",
   "main": "index.ts",
   "type": "module",
@@ -46,7 +46,9 @@
   },
   "homepage": "https://github.com/hypermedia-app/web-access-control#rdf-web-access-control",
   "mocha": {
-    "extension": ["ts"],
+    "extension": [
+      "ts"
+    ],
     "recursive": true,
     "loader": "ts-node/esm",
     "require": [

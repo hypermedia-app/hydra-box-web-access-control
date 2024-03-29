@@ -1,6 +1,6 @@
 {
   "name": "hydra-web-access-control",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Using W3C Web Access Control vocabulary to protect Hydra APIs",
   "main": "index.js",
   "type": "module",
@@ -18,7 +18,7 @@
     "@tpluscode/rdf-ns-builders": "^4.3.0",
     "http-errors": "^2.0.0",
     "middleware-async": "^1.4.0",
-    "rdf-web-access-control": "^2.0.0"
+    "rdf-web-access-control": "^3.0.0"
   },
   "devDependencies": {
     "@types/supertest": "^6.0.2",
@@ -46,7 +46,9 @@
   },
   "homepage": "https://github.com/hypermedia-app/web-access-control#hydra-web-access-control",
   "mocha": {
-    "extension": ["ts"],
+    "extension": [
+      "ts"
+    ],
     "recursive": true,
     "loader": "ts-node/esm",
     "require": [
