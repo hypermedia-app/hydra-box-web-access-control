@@ -32,7 +32,7 @@
     "mocha": "^10.4.0",
     "sinon": "^17.0.1",
     "sparql-http-client": "^3.0.0",
-    "wait-on": "^5.3.0"
+    "wait-on": "^7.2.0"
   },
   "repository": {
     "type": "git",
