@@ -1,17 +1,17 @@
-import { variable } from '@rdfjs/data-model'
+import rdf from '@rdfjs/data-model'
 import { ASK, sparql, SparqlTemplateResult } from '@tpluscode/sparql-builder'
 import { acl, foaf, rdfs } from '@tpluscode/rdf-ns-builders'
-import type { SparqlAskExecutable } from '@tpluscode/sparql-builder/lib'
-import type { AuthorizationPatterns, TypeCheck } from '..'
-import { agentClasses, combinePatterns, onlyNamedNodes } from '.'
+import type { SparqlAskExecutable } from '@tpluscode/sparql-builder'
+import type { AuthorizationPatterns, TypeCheck } from '../index.js'
+import { agentClasses, combinePatterns, onlyNamedNodes } from './index.js'
 
 export function typeAuthorization(
   { agent, accessMode, types, additionalPatterns = [] }: Omit<TypeCheck, 'client'>,
   authorizationChecks: AuthorizationPatterns[],
 ): SparqlAskExecutable {
   const agentTerm = agent?.term.termType === 'NamedNode' ? agent.term : null
-  const authorization = variable('authorization')
-  const check = { authorization, agent: variable('agent'), agentClass: variable('agentClass') }
+  const authorization = rdf.variable('authorization')
+  const check = { authorization, agent: rdf.variable('agent'), agentClass: rdf.variable('agentClass') }
 
   const patternUnion = authorizationChecks.reduce((previous: SparqlTemplateResult | string, buildPatterns) => {
     const next = sparql`{

@@ -1,9 +1,10 @@
 {
   "name": "web-access-control",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "eslint . --ext .ts --quiet --ignore-path .gitignore --ignore-path .eslintignore",
-    "test": "c8 --all --reporter=lcov mocha --recursive --extension ts packages/**/*.test.ts",
+    "test": "c8 --all --reporter=lcovonly mocha",
     "prepare": "husky install",
     "release": "changeset publish"
   },
@@ -11,45 +12,27 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@babel/core": "^7.13.14",
-    "@babel/preset-env": "^7.13.12",
-    "@babel/preset-typescript": "^7.13.0",
-    "@babel/register": "^7.13.14",
-    "@changesets/cli": "^2.22.0",
-    "@tpluscode/eslint-config": "^0.3",
+    "@changesets/cli": "^2.27.1",
+    "@tpluscode/eslint-config": "^0.4.5",
     "@types/chai": "^4.2.15",
-    "@types/clownface": "^1",
+    "@types/clownface": "^2.0.7",
     "@types/express": "^4.17.11",
-    "@types/http-errors": "^1.8.0",
-    "@types/mocha": "^9.1.1",
-    "@types/sinon": "^9.0.11",
+    "@types/http-errors": "^2.0.4",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^18",
+    "@types/sinon": "^17.0.3",
     "@types/sinon-chai": "^3.2.5",
-    "@types/sparql-http-client": "^2.2.5",
-    "@typescript-eslint/eslint-plugin": "^4.20.0",
-    "@typescript-eslint/parser": "^4.20.0",
+    "@types/sparql-http-client": "^3.0.1",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
     "c8": "^7.7.0",
-    "eslint": "^7.23.0",
-    "eslint-config-standard": "^16.0.2",
-    "eslint-import-resolver-typescript": "^2.4.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.3.1",
-    "eslint-plugin-standard": "^5.0.0",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "husky": "^6.0.0",
-    "lint-staged": "^10.5.4",
+    "lint-staged": "^15.2.2",
     "sinon-chai": "^3.6.0",
-    "standard": "^16.0.3",
-    "typescript": "^4.2.3"
-  },
-  "mocha": {
-    "extension": ["ts"],
-    "watch-files": [
-      "./**/*.ts",
-      "./**/*.ru"
-    ],
-    "require": [
-      "mocha-setup.cjs"
-    ]
+    "standard": "^17.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.3"
   },
   "lint-staged": {
     "*.{js,ts}": [

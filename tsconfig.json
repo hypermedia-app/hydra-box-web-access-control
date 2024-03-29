@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "module": "CommonJS",
+    "target": "es2022",
+    "module": "NodeNext",
     "strictNullChecks": true,
     "strict": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "esModuleInterop": true,
     "declaration": true,
     "declarationMap": true,

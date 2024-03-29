@@ -1,10 +1,10 @@
-import { DatasetCore, NamedNode, Term, Variable } from '@rdfjs/types'
+import type { DatasetCore, NamedNode, Term, Variable } from '@rdfjs/types'
 import { SparqlTemplateResult } from '@tpluscode/sparql-builder'
-import type { StreamClient } from 'sparql-http-client/StreamClient'
+import type StreamClient from 'sparql-http-client/StreamClient.js'
 import type { GraphPointer } from 'clownface'
-import * as checks from './checks'
-import { typeAuthorization } from './lib/typeAuthorization'
-import { instanceAuthorization } from './lib/instanceAuthorization'
+import * as checks from './checks.js'
+import { typeAuthorization } from './lib/typeAuthorization.js'
+import { instanceAuthorization } from './lib/instanceAuthorization.js'
 
 export interface AdditionalPatterns {
   (acl: Variable): SparqlTemplateResult | string
@@ -50,8 +50,8 @@ export function check({ client, additionalChecks = [], ...rest }: ResourceCheck 
   ]
 
   if ('term' in rest) {
-    return instanceAuthorization(rest, authorizationChecks).execute(client.query)
+    return instanceAuthorization(rest, authorizationChecks).execute(client)
   }
 
-  return typeAuthorization(rest, authorizationChecks).execute(client.query)
+  return typeAuthorization(rest, authorizationChecks).execute(client)
 }

@@ -3,22 +3,24 @@ import { describe, it, beforeEach } from 'mocha'
 import express, { Express } from 'express'
 import request from 'supertest'
 import httpStatus from 'http-status'
-import * as acl from 'rdf-web-access-control'
 import sinon from 'sinon'
 import { expect } from 'chai'
 import * as ns from '@tpluscode/rdf-ns-builders/loose'
-import clownface from 'clownface'
-import $rdf from 'rdf-ext'
-import accessControl from '..'
+import $rdf from '@zazuko/env'
+import { HydraBox } from '@kopflos-cms/core'
+import type StreamClient from 'sparql-http-client/StreamClient.js'
+import esmock from 'esmock'
+import type AccessControl from '../index.js'
 
 describe('hydra-box-web-access-control', () => {
   let app: Express
-  let aclSpy: sinon.SinonStubbedInstance<typeof acl>
-  const client = {} as any
+  let acl: { check: sinon.SinonStub }
+  let accessControl!: typeof AccessControl
+  const client = {} as unknown as StreamClient
   const term = $rdf.namedNode('http://example.com/resource')
   const resourceTerm = $rdf.namedNode('http://example.com/resource2')
 
-  beforeEach(() => {
+  beforeEach(async () => {
     app = express()
     app.use(function hydraBoxMock(req, res, next) {
       req.hydra = {
@@ -26,11 +28,16 @@ describe('hydra-box-web-access-control', () => {
         resource: {
           term: resourceTerm,
         },
-      } as any
+      } as unknown as HydraBox
       next()
     })
 
-    aclSpy = sinon.stub(acl)
+    acl = {
+      check: sinon.stub(),
+    }
+    accessControl = await esmock('../index.js', {
+      'rdf-web-access-control': acl,
+    })
   })
 
   afterEach(() => {
@@ -40,7 +47,7 @@ describe('hydra-box-web-access-control', () => {
   it('passes right parameters to check', async () => {
     // given
     const additionalPatterns = sinon.stub()
-    const agent = clownface({ dataset: $rdf.dataset() }).namedNode('')
+    const agent = $rdf.clownface().namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
       next()
@@ -56,7 +63,7 @@ describe('hydra-box-web-access-control', () => {
     // then
     expect(acl.check).to.have.been.calledWith(sinon.match({
       client,
-      agent,
+      agent: sinon.match.same(agent),
       term: [term, resourceTerm],
       additionalPatterns: sinon.match.array,
     }))
@@ -67,7 +74,7 @@ describe('hydra-box-web-access-control', () => {
     app.use(accessControl({
       client,
     }))
-    aclSpy.check.resolves(false)
+    acl.check.resolves(false)
 
     // when
     const response = request(app).get('/resource')
@@ -78,7 +85,7 @@ describe('hydra-box-web-access-control', () => {
 
   it('responds 403 when access is not granted and a user is authenticated', async () => {
     // given
-    const agent = clownface({ dataset: $rdf.dataset() }).namedNode('')
+    const agent = $rdf.clownface().namedNode('')
     app.use((req, res, next) => {
       req.agent = agent
       next()
@@ -86,7 +93,7 @@ describe('hydra-box-web-access-control', () => {
     app.use(accessControl({
       client,
     }))
-    aclSpy.check.resolves(false)
+    acl.check.resolves(false)
 
     // when
     const response = request(app).get('/resource')
@@ -106,7 +113,7 @@ describe('hydra-box-web-access-control', () => {
     app.use(accessControl({
       client,
     }))
-    aclSpy.check.resolves(false)
+    acl.check.resolves(false)
 
     // when
     await request(app).get('/resource')
@@ -117,7 +124,7 @@ describe('hydra-box-web-access-control', () => {
 
   it('responds 200 when access is granted', async () => {
     // given
-    aclSpy.check.resolves(true)
+    acl.check.resolves(true)
     app.use(accessControl({
       client,
     }))
@@ -133,7 +140,7 @@ describe('hydra-box-web-access-control', () => {
   it('uses acl mode from hydra operation', async () => {
     // given
     app.use((req, res, next) => {
-      req.hydra.operation = clownface({ dataset: $rdf.dataset() })
+      req.hydra.operation = $rdf.clownface()
         .blankNode()
         .addOut(ns.acl.mode, ns.acl.Delete)
       next()
@@ -178,7 +185,7 @@ describe('hydra-box-web-access-control', () => {
   for (const [method, accessMode] of mappedMethods) {
     it(`maps method ${method} to mode ${accessMode.value}`, async () => {
       // given
-      aclSpy.check.resolves(true)
+      acl.check.resolves(true)
       app.use(accessControl({
         client,
       }))

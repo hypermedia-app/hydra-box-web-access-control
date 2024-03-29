@@ -1,9 +1,9 @@
 import { describe, it } from 'mocha'
-import { namedNode, variable } from '@rdfjs/data-model'
+import rdf from '@zazuko/env'
 import { SELECT } from '@tpluscode/sparql-builder'
 import { expect } from 'chai'
-import { agentGroup } from '../checks'
-import { insertAcls, insertData, parsingClient, resource } from './data'
+import { agentGroup } from '../checks.js'
+import { insertAcls, insertData, parsingClient, resource } from './data.js'
 
 describe('rdf-web-access-control/checks', () => {
   before(insertData)
@@ -12,15 +12,15 @@ describe('rdf-web-access-control/checks', () => {
   it('should find agent by group', async () => {
     // given
     const patterns = agentGroup({
-      authorization: variable('authorization'),
+      authorization: rdf.variable('authorization'),
       agent: resource.Penny,
-      agentClass: variable('agentClass'),
+      agentClass: rdf.variable('agentClass'),
     })
 
     // when
-    const [{ authorization }] = await SELECT`?authorization`.WHERE`${patterns}`.execute(parsingClient.query)
+    const [{ authorization }] = await SELECT`?authorization`.WHERE`${patterns}`.execute(parsingClient)
 
     // then
-    expect(authorization).to.deep.eq(namedNode('urn:acl:howard-shares-with-group'))
+    expect(authorization).to.deep.eq(rdf.namedNode('urn:acl:howard-shares-with-group'))
   })
 })
