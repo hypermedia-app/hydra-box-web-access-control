@@ -1,5 +1,18 @@
 # hydra-box-web-access-control
 
+## 3.0.0
+
+### Major Changes
+
+- d46faaf: Built with `moduleResolution=NodeNext`
+- d46faaf: Use `@kopflos-cms/core` instead of `hydra-box`
+
+### Patch Changes
+
+- Updated dependencies [d46faaf]
+- Updated dependencies [ff4e2c2]
+  - rdf-web-access-control@3.0.0
+
 ## 2.0.0
 
 ### Major Changes

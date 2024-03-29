@@ -1,5 +1,12 @@
 # rdf-web-access-control
 
+## 3.0.0
+
+### Major Changes
+
+- d46faaf: Built with `moduleResolution=NodeNext`
+- ff4e2c2: `sparql-http-client` updated to v3 and made peer dependency
+
 ## 2.0.0
 
 ### Major Changes
