@@ -46,9 +46,7 @@
   },
   "homepage": "https://github.com/hypermedia-app/web-access-control#hydra-web-access-control",
   "mocha": {
-    "extensions": [
-      "ts"
-    ],
+    "extension": ["ts"],
     "recursive": true,
     "loader": "ts-node/esm",
     "require": [
